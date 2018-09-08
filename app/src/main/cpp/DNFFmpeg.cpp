@@ -7,6 +7,12 @@
 #include "macro.h"
 
 
+void *play(void *args) {
+    DNFFmpeg *dnfFmpeg = static_cast<DNFFmpeg *>(args);
+    dnfFmpeg->_start();
+    return 0;
+}
+
 void *task_prepare(void *args) {
     DNFFmpeg *ffmpeg = static_cast<DNFFmpeg *>(args);
     ffmpeg->_prepare();
@@ -94,9 +100,10 @@ void DNFFmpeg::_prepare() {
         }
 
         if (codecpar->codec_type == AVMEDIA_TYPE_AUDIO) {
-            audioChannel = new AudioChannel;
+            audioChannel = new AudioChannel(i, context3);
         } else if (codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoChannel = new VideoChannel;
+            videoChannel = new VideoChannel(i, context3);
+            videoChannel->setRenderFrameCallback(callback);
         }
     }
 
@@ -107,4 +114,32 @@ void DNFFmpeg::_prepare() {
     }
 
     callHelper->onPrepared(THREAD_CHILD);
+}
+
+void DNFFmpeg::start() {
+    isPlaying = 1;
+    if (videoChannel) {
+        videoChannel->packets.setWork(1);
+        videoChannel->play();
+        pthread_create(&pid_play, 0, play, this);
+    }
+}
+
+void DNFFmpeg::_start() {
+    int ret;
+    while (isPlaying) {
+        AVPacket *packet = av_packet_alloc();
+        ret = av_read_frame(formatContext, packet);
+        if (ret == 0) {
+            if (audioChannel && packet->stream_index == audioChannel->id) {
+
+            } else if (videoChannel && packet->stream_index == videoChannel->id) {
+                videoChannel->packets.push(packet);
+            }
+        } else if (ret == AVERROR_EOF) {
+            LOG_I("AVPacket 读取完成");
+        } else {
+
+        }
+    }
 }

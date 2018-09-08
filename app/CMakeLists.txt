@@ -15,4 +15,15 @@ include_directories(libs/include)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}")
 
-target_link_libraries(native-lib avformat avcodec avfilter avutil swresample swscale log z)
+target_link_libraries(
+                        native-lib
+                        avformat
+                        avcodec
+                        avfilter
+                        avutil
+                        swresample
+                        swscale
+                        log
+                        z
+                        android
+                       )

@@ -14,20 +14,35 @@ extern "C" {
 };
 
 class DNFFmpeg {
+
 public:
     DNFFmpeg(JavaCallHelper *callHelper, const char *dataSource);
+
     ~DNFFmpeg();
 
     void prepare();
+
     void _prepare();
+
+    void start();
+
+    void _start();
+
+    void setRenderFrameCallback(RenderFrameCallback callback) {
+        this->callback = callback;
+    }
 
 private:
     char *dataSource;
     pthread_t pid;
-    AVFormatContext *formatContext;
+    pthread_t pid_play;
+    bool isPlaying;
+
     JavaCallHelper *callHelper;
-    AudioChannel *audioChannel;
-    VideoChannel *videoChannel;
+    AVFormatContext *formatContext = 0;
+    AudioChannel *audioChannel = 0;
+    VideoChannel *videoChannel = 0;
+    RenderFrameCallback callback;
 };
 
 

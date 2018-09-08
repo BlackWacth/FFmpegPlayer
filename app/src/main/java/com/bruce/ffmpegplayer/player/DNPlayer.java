@@ -1,6 +1,7 @@
-package com.bruce.ffmpegplayer;
+package com.bruce.ffmpegplayer.player;
 
 import android.util.Log;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -42,7 +43,7 @@ public class DNPlayer implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
+        native_setSurface(holder.getSurface());
     }
 
     @Override
@@ -55,10 +56,10 @@ public class DNPlayer implements SurfaceHolder.Callback {
     }
 
 
-
     public void start() {
-
+        native_start();
     }
+
 
     public void stop() {
 
@@ -68,8 +69,8 @@ public class DNPlayer implements SurfaceHolder.Callback {
         mSurfaceHolder.removeCallback(this);
     }
 
-    public void onError(int errorCode){
-        Log.i("hzw", "Java接到回调:"+errorCode);
+    public void onError(int errorCode) {
+        Log.i("hzw", "Java接到回调:" + errorCode);
     }
 
     public void onPrepared() {
@@ -79,4 +80,8 @@ public class DNPlayer implements SurfaceHolder.Callback {
     }
 
     public native void native_prepare(String dataSource);
+
+    public native void native_start();
+
+    public native void native_setSurface(Surface surface);
 }
